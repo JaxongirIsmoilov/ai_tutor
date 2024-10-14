@@ -1,7 +1,9 @@
+import 'package:ai_tutor/src/core/di/di.dart';
 import 'package:ai_tutor/src/features/chat/presentation/pages/home_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  setUpDependencies();
   runApp(const MyApp());
 }
 
