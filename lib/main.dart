@@ -1,28 +1,44 @@
-import 'package:ai_tutor/src/core/di/di.dart';
-import 'package:ai_tutor/src/features/chat/presentation/pages/home_page.dart';
+import 'package:ai_tutor/src/features/chat/presentation/pages/screens/base_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  setUpDependencies();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'AI tutor',
+      debugShowCheckedModeBanner: false,
+      title: 'Education App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
+        fontFamily: 'Poppins',
+        textTheme: const TextTheme(
+          titleLarge: TextStyle(
+            fontSize: 20,
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+          ),
+          bodyLarge: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+          ),
+          bodyMedium: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+          displayMedium: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 18,
+            color: Colors.black,
+          ),
+        ),
       ),
-      initialRoute: '/',
-      routes: {
-        '/' : (context) => HomePage()
-      },
+      home: const BaseScreen(),
     );
   }
 }
