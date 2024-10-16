@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:ai_tutor/src/core/constants/api_constants.dart';
 import 'package:ai_tutor/src/core/http/api_service.dart';
 import 'package:ai_tutor/src/core/http/failure.dart';
+import 'package:ai_tutor/src/core/services/hive_service.dart';
 import 'package:ai_tutor/src/features/chat/data/models/remote/request/voice_answer.dart';
 import 'package:ai_tutor/src/features/chat/data/models/remote/response/response_model.dart';
 import 'package:ai_tutor/src/features/chat/domain/repository/chat_repository.dart';

@@ -1,6 +1,11 @@
 part of 'home_bloc.dart';
 
-@immutable
-sealed class HomeState {}
+@freezed
+class HomeState with _$HomeState {
+  const factory HomeState({
+    String? question,
+    File? speechAnswer,
+    @Default(false) bool isGettingQuestion,
+  }) = _HomeState;
+}
 
-final class HomeInitial extends HomeState {}

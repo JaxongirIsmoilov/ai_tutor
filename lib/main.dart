@@ -1,9 +1,11 @@
 import 'package:ai_tutor/src/core/di/di.dart';
+import 'package:ai_tutor/src/core/services/hive_service.dart';
 import 'package:ai_tutor/src/features/chat/presentation/pages/home_page.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+Future<void> main() async {
   setUpDependencies();
+  await HiveService.initHive();
   runApp(const MyApp());
 }
 
