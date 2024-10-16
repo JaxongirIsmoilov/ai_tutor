@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+
+import '../../bloc/home_bloc.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -8,7 +11,8 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateMixin {
+class _ChatScreenState extends State<ChatScreen>
+    with SingleTickerProviderStateMixin {
   TextEditingController promptController = TextEditingController();
   ScrollController controller = ScrollController();
   late AnimationController _animationController;
@@ -21,19 +25,24 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
+    context.read<HomeBloc>().add(StartQuizEvent(context),);
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(CurvedAnimation(
+    _scaleAnimation =
+        Tween<double>(begin: 1.0, end: 1.2).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
-    _rotationAnimation = Tween<double>(begin: 0.0, end: 0.2).animate(CurvedAnimation(
+    _rotationAnimation =
+        Tween<double>(begin: 0.0, end: 0.2).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
-    _colorAnimation = ColorTween(begin: Colors.indigoAccent, end: Colors.blueAccent).animate(CurvedAnimation(
+    _colorAnimation =
+        ColorTween(begin: Colors.indigoAccent, end: Colors.blueAccent)
+            .animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
@@ -70,112 +79,120 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.greenAccent.withOpacity(0.3),
-      appBar: AppBar(
-        elevation: 3,
-        backgroundColor: Colors.blue,
-        centerTitle: true,
-        title: const Text(
-          "AI Tutor",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              controller: controller,
-              itemCount: prompt.length,
-              itemBuilder: (context, index) {
-                final message = prompt[index];
-                return UserPrompt(
-                  isPrompt: message.isPrompt,
-                  message: message.message,
-                  date: DateFormat('hh:mm a').format(message.time),
-                );
-              },
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, state) {
+        if(state.question != null){
+          prompt.add(ModelMessage(isPrompt: false, message: state.question!, time: DateTime.now()));
+        }
+        print("sdfghjklkjhgfghjkjhgc ${prompt.length}");
+        return Scaffold(
+          backgroundColor: Colors.grey,
+          appBar: AppBar(
+            elevation: 3,
+            backgroundColor: Colors.blue,
+            centerTitle: true,
+            title: const Text(
+              "AI Tutor",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(25),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 20,
-                  child: TextField(
-                    maxLines: null,
-                    controller: promptController,
-                    decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(20),
+          body: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  controller: controller,
+                  itemCount: prompt.length,
+                  itemBuilder: (context, index) {
+                    final message = prompt[index];
+                    return UserPrompt(
+                      isPrompt: message.isPrompt,
+                      message: message.message,
+                      date: DateFormat('hh:mm a').format(message.time),
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(25),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 20,
+                      child: TextField(
+                        maxLines: null,
+                        controller: promptController,
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          filled: true,
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          hintText: "Ask anything you want",
+                          hintStyle: const TextStyle(color: Colors.black45),
+                        ),
                       ),
-                      hintText: "Ask anything you want",
-                      hintStyle: const TextStyle(color: Colors.black45),
                     ),
-                  ),
-                ),
-                const Spacer(),
-                GestureDetector(
-                  onTap: () {
-                    sendMessage();
-                  },
-                  child: const CircleAvatar(
-                    backgroundColor: Colors.green,
-                    child: Icon(
-                      Icons.send,
-                      color: Colors.white,
-                      size: 20,
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () {
+                        sendMessage();
+                      },
+                      child: const CircleAvatar(
+                        backgroundColor: Colors.green,
+                        child: Icon(
+                          Icons.send,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                const Spacer(),
-                GestureDetector(
-                  onLongPress: () {
-                    _animationController.forward();
-                    // Start recording logic can go here
-                  },
-                  onLongPressUp: () {
-                    _animationController.reverse();
-                    // Stop recording logic can go here
-                  },
-                  child: AnimatedBuilder(
-                    animation: _animationController,
-                    builder: (context, child) {
-                      return Transform.rotate(
-                        angle: _rotationAnimation.value,
-                        child: ScaleTransition(
-                          scale: _scaleAnimation,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: _colorAnimation.value,
-                            ),
-                            child: const CircleAvatar(
-                              child: Icon(
-                                Icons.mic,
-                                color: Colors.red,
-                                size: 20,
+                    const Spacer(),
+                    GestureDetector(
+                      onLongPress: () {
+                        _animationController.forward();
+                        // Start recording logic can go here
+                      },
+                      onLongPressUp: () {
+                        _animationController.reverse();
+                        // Stop recording logic can go here
+                      },
+                      child: AnimatedBuilder(
+                        animation: _animationController,
+                        builder: (context, child) {
+                          return Transform.rotate(
+                            angle: _rotationAnimation.value,
+                            child: ScaleTransition(
+                              scale: _scaleAnimation,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: _colorAnimation.value,
+                                ),
+                                child: const CircleAvatar(
+                                  child: Icon(
+                                    Icons.mic,
+                                    color: Colors.red,
+                                    size: 20,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -229,5 +246,6 @@ class ModelMessage {
   final String message;
   final DateTime time;
 
-  ModelMessage({required this.isPrompt, required this.message, required this.time});
+  ModelMessage(
+      {required this.isPrompt, required this.message, required this.time});
 }
